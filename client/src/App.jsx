@@ -5,23 +5,26 @@ const socket = io("http://localhost:4000");
 
 function App() {
   const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState([]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     socket.emit("message", message);
+    const newMessage = { body: message, from: "Me" };
+    setMessages([newMessage, ...messages]);
     setMessage("");
   };
 
   useEffect(() => {
-    const receiveMsg = (msg) => {
-      console.log(msg);
+    const receiveMsg = (message) => {
+      setMessages([message, ...messages]);
     };
     socket.on("message", receiveMsg);
 
     return () => {
       socket.off("message", receiveMsg);
     };
-  }, [message]);
+  }, [messages]);
 
   return (
     <div>
@@ -33,6 +36,15 @@ function App() {
         />
         <button>Send</button>
       </form>
+      {messages.map((message, index) => {
+        return (
+          <div key={index}>
+            <p>
+              {message.from}: {message.body}
+            </p>
+          </div>
+        );
+      })}
     </div>
   );
 }
