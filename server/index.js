@@ -17,8 +17,10 @@ const io = new SocketServer(server, {
 app.use(cors());
 app.use(morgan("dev"));
 
-io.on("connection", () => {
-  console.log("a user connected");
+io.on("connection", (socket) => {
+  socket.on("message", (message) => {
+    socket.broadcast.emit("message", message);
+  });
 });
 
 server.listen(PORT, () => {
