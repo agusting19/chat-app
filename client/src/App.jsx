@@ -1,31 +1,17 @@
-import { useEffect, useState } from "react";
-import io from "socket.io-client";
+import { useState } from "react";
+import { useSocket } from "./hooks/useSocket";
 import { Box, Button, Input } from "@chakra-ui/react";
-
-const socket = io("http://localhost:4000");
+import MessageList from "./components/MessageList";
 
 function App() {
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState([]);
+  const [messages, sendMessage] = useSocket();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    socket.emit("message", message);
-    const newMessage = { body: message, from: "Me" };
-    setMessages([...messages, newMessage]);
+    sendMessage(message);
     setMessage("");
   };
-
-  useEffect(() => {
-    const receiveMsg = (message) => {
-      setMessages([...messages, message]);
-    };
-    socket.on("message", receiveMsg);
-
-    return () => {
-      socket.off("message", receiveMsg);
-    };
-  }, [messages]);
 
   return (
     <Box
@@ -48,27 +34,7 @@ function App() {
         padding="40px 30px"
         bg="#2292A4"
       >
-        <Box
-          display="flex"
-          flexDir="column"
-          gap="5px"
-          height="100%"
-          width="100%"
-          padding="5px"
-          bg="#d9d9d9"
-          borderRadius="5px"
-        >
-          {messages.map((message, index) => {
-            return (
-              <Box key={index} bg="#f2f2f2" maxWidth="50%" padding="5px 10px">
-                <Box as="h3" color="#009933">
-                  {message.from}
-                </Box>
-                <Box as="p">{message.body}</Box>
-              </Box>
-            );
-          })}
-        </Box>
+        <MessageList messages={messages} />
         <Box
           as="form"
           display="flex"
