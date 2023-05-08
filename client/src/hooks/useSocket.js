@@ -6,7 +6,7 @@ export const useSocket = () => {
   const socketRef = useRef(null);
 
   useEffect(() => {
-    socketRef.current = io("http://localhost:4000");
+    socketRef.current = io();
 
     const receiveMsg = (message) => {
       setMessages((messages) => [...messages, message]);
